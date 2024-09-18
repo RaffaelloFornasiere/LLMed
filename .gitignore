@@ -1,0 +1,14 @@
+*/llama-cpp-python
+*/pymupdf.pdf
+.idea/
+
+/node_modules
+__pycache__
+
+.venv/
+.env/
+
+# don't add models or documents to the Github repo!
+models/*.gguf
+documents/data
+

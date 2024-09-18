@@ -1,0 +1,11 @@
+__pycache__/
+venv/
+*.pdf
+*.ckpt
+spark_jsl*
+data/checkpoints/*/
+*.zip
+*.tar.gz
+# Folders
+.vscode
+*.bin
