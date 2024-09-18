@@ -1,6 +1,5 @@
 networks:
   hbd-demo-network:
-    external: true
 volumes:
   elasticsearch-data:
     driver: local
