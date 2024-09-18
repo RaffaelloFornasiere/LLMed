@@ -1,14 +1,19 @@
 <script>
-import { ref } from "vue";
-import { sendMessageToLLM } from "components/MedicalInformationExtraction/utils";
+import {ref} from "vue";
+import {sendMessageToLLM} from "components/MedicalInformationExtraction/utils";
 
 export default {
   name: "MIEChat",
-  props: { doc: String },
+  props: {
+    doc: String, label: {
+      type: String,
+      default: "Chat with the AI assistant"
+    }
+  },
   mounted() {
-    setTimeout(() =>{
+    setTimeout(() => {
 
-      this.chat[0].content = this.systemMessage.replace("{doc}", this.doc??'');
+      this.chat[0].content = this.systemMessage.replace("{doc}", this.doc ?? '');
 
     }, 10)
   },
@@ -39,11 +44,11 @@ Le risposte sono coincise ed esaustive.
   },
   watch: {
     doc: function (newValue) {
-      this.chat[0].content = this.systemMessage.replace("{doc}", newValue??'');
+      this.chat[0].content = this.systemMessage.replace("{doc}", newValue ?? '');
     },
   },
   methods: {
-    clear(){
+    clear() {
       this.chat = [this.chat[0]]
     },
     send() {
@@ -59,45 +64,45 @@ Le risposte sono coincise ed esaustive.
       sendMessageToLLM(this.chat, {})
         .then((response) => {
           this.text = ""
-        let reader = response.getReader();
-        const processStream = ({ done, value }) => {
-          if (done) {
-            this.loading = false;
-            return;
-          }
-          let chunkRaw = new TextDecoder().decode(value);
-          const chunkArray = chunkRaw.split("data:").slice(1);
-
-          for (let chunk of chunkArray) {
-            try {
-              chunk = JSON.parse(chunk.split(": ping -")[0]);
-            } catch {
-              console.log("il parsing non è andato a buon fine");
-              console.log(chunk);
+          let reader = response.getReader();
+          const processStream = ({done, value}) => {
+            if (done) {
+              this.loading = false;
+              return;
             }
-            if (Object.keys(chunk).includes("choices")) {
-              if (Object.keys(chunk["choices"][0]["delta"]).includes("role")) {
-                this.chat.slice(-1)[0]["role"] =
-                  chunk["choices"][0]["delta"]["role"];
-                this.chat.slice(-1)[0]["content"] = "";
-              } else {
-                this.chat.slice(-1)[0]["content"] += chunk["choices"][0][
-                  "delta"
-                ]["content"]
-                  ? chunk["choices"][0]["delta"]["content"]
-                  : "";
-                // Gestisci il chunk di evento ricevuto dallo stream
-                this.$nextTick(() => {
-                  this.$refs.chatWindow.scrollTop =
-                    this.$refs.chatWindow.scrollHeight;
-                });
+            let chunkRaw = new TextDecoder().decode(value);
+            const chunkArray = chunkRaw.split("data:").slice(1);
+
+            for (let chunk of chunkArray) {
+              try {
+                chunk = JSON.parse(chunk.split(": ping -")[0]);
+              } catch {
+                console.log("il parsing non è andato a buon fine");
+                console.log(chunk);
+              }
+              if (Object.keys(chunk).includes("choices")) {
+                if (Object.keys(chunk["choices"][0]["delta"]).includes("role")) {
+                  this.chat.slice(-1)[0]["role"] =
+                    chunk["choices"][0]["delta"]["role"];
+                  this.chat.slice(-1)[0]["content"] = "";
+                } else {
+                  this.chat.slice(-1)[0]["content"] += chunk["choices"][0][
+                    "delta"
+                    ]["content"]
+                    ? chunk["choices"][0]["delta"]["content"]
+                    : "";
+                  // Gestisci il chunk di evento ricevuto dallo stream
+                  this.$nextTick(() => {
+                    this.$refs.chatWindow.scrollTop =
+                      this.$refs.chatWindow.scrollHeight;
+                  });
+                }
               }
             }
-          }
-          return reader.read().then(processStream);
-        };
-        reader.read().then(processStream);
-      })
+            return reader.read().then(processStream);
+          };
+          reader.read().then(processStream);
+        })
     },
   },
 };
@@ -137,7 +142,7 @@ Le risposte sono coincise ed esaustive.
     <div class="col-grow">
       <div class="col-grow"></div>
     </div>
-    <q-input bottom-slots v-on:keyup.enter="send"  v-model="text" label="Message" :dense="dense">
+    <q-input bottom-slots v-on:keyup.enter="send" v-model="text" :label="label" :dense="dense">
       <template v-slot:after>
         <q-btn
           round

@@ -12,7 +12,6 @@ app = FastAPI()
 
 app.include_router(medInfoExt_app)
 
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
