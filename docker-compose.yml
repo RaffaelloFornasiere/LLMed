@@ -23,31 +23,29 @@ services:
 
 
 
-#  hbd_llamacpp:
-#    container_name: hbd_llamacpp
-#    image: llama-cpp-python:latest
-#    build:
-#      context: ./llama-server/
-#      dockerfile: Dockerfile
-#    volumes:
-#      - ./models/:/models/
-#    command: sh -c "python3 -m llama_cpp.server --model /models/Meta-Llama-3-8B-Instruct-Q5_K_M.gguf --n_ctx 8182 --cache true --chat_format llama-3 --n_gpu_layers -1"
-#    environment:
-#      - HOST=0.0.0.0
-#    ports:
-#      - "51124:8000"
-#    deploy:
-#      resources:
-#        limits:
-#          memory: 32GB
-#        reservations:
-#          devices:
-#            - driver: nvidia
-#              device_ids: ["1"]
-#              capabilities: [ gpu ]
-#    restart: "always"
-#    networks:
-#      - hbd-demo-network
+  hbd_llamacpp:
+    container_name: hbd_llamacpp
+    image: llama-cpp-python:latest
+    build:
+      context: ./llama-server/
+      dockerfile: Dockerfile
+    volumes:
+      - ~/models/:/models/
+    command: sh -c "python3 -m llama_cpp.server --model /models/Meta-Llama-3-8B-Instruct-Q8_0.gguf --n_ctx 8182 --cache true --chat_format llama-3 --n_gpu_layers -1"
+    environment:
+      - HOST=0.0.0.0
+    deploy:
+      resources:
+        limits:
+          memory: 32GB
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ["0"]
+              capabilities: [ gpu ]
+    restart: "always"
+    networks:
+      - hbd-demo-network
 
   hbd_frontend:
     image: hbd-demo-frontend:latest
