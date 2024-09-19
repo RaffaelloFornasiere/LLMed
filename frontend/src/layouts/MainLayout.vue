@@ -4,7 +4,7 @@
         <!-- <img src="quasar-logo-vertical.svg"/> -->
         <q-toolbar-title class="row justify-center q-pa-md" style="text-align:center">
         <div>
-          <div>
+          <div style="font-size: 1.1rem; text-wrap: wrap">
             Medical Information Extraction with LLM
           </div>
         </div>

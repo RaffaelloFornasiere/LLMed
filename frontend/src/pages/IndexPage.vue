@@ -1,7 +1,18 @@
 <template>
 
-
-  <q-page padding class="row items-stretch" style="height: 100%; min-width: 1024px">
+<div v-if="useLargerScreen"
+  class="q-pa-md text-h4 text-center text-weight-bold" style="height: 100%"
+>
+  Application is not supported on smaller screens.
+  <br>
+  <span
+  class="text-h6"
+  >(Minimum screen size: 1024x768)
+  </span>
+</div>
+  <q-page
+    v-if="!useLargerScreen"
+    padding class="row items-stretch" style="height: 100%; min-width: 1024px">
     <div class="col-12 column no-wrap">
       <div class="row no-wrap justify-between" style="height: 100%">
         <div class="column no-wrap full-height full-width">
@@ -50,6 +61,7 @@ export default defineComponent({
 
   setup() {
     return {
+      useLargerScreen: ref(false),
       modelName: ref(""),
       inputMode: ref("edit"),
       dropzoneURL: ref(""),
@@ -148,11 +160,19 @@ export default defineComponent({
       }),
     };
   },
-  mounted() {},
+  mounted() {
+    this.onResize()
+    this.$nextTick(() => {
+      window.addEventListener('resize', this.onResize);
+    })
+  },
   methods: {
     updateTaskName() {
       this.setupName = null;
       this.taskName = this.taskName.value;
+    },
+    onResize() {
+      this.useLargerScreen = window.innerWidth < 1024 || window.innerHeight < 768;
     },
   },
 });
