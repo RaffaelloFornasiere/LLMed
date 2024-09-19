@@ -1,5 +1,7 @@
 <template>
-  <q-page padding class="row items-stretch" style="height: 100%">
+
+
+  <q-page padding class="row items-stretch" style="height: 100%; min-width: 1024px">
     <div class="col-12 column no-wrap">
       <div class="row no-wrap justify-between" style="height: 100%">
         <div class="column no-wrap full-height full-width">
