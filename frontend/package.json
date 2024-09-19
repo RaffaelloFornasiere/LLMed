@@ -1,8 +1,8 @@
 {
-  "name": "hbd-demo",
+  "name": "LLMed",
   "version": "0.0.1",
-  "description": "hbd-demo project",
-  "productName": "hbd-demo",
+  "description": "LLMed project",
+  "productName": "LLMed",
   "author": "giuseppe serna <giuseppe.serna@polimi.it>",
   "private": true,
   "scripts": {
