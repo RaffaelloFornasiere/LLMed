@@ -1,3 +1,5 @@
+name: llmed
+
 networks:
   hbd-demo-network:
 volumes:
@@ -10,42 +12,42 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
     ports:
-      - "8080:8080"
+      - "9090:8080"
     networks:
       - hbd-demo-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  #
     depends_on:
       hbd_frontend:
         condition: service_started
       hbd_backend:
         condition: service_started
-#      hbd_llamacpp:
-#        condition: service_started
 
 
 
-  hbd_llamacpp:
-    container_name: hbd_llamacpp
-    image: llama-cpp-python:latest
-    build:
-      context: ./llama-server/
-      dockerfile: Dockerfile
-    volumes:
-      - ~/models/:/models/
-    command: sh -c "python3 -m llama_cpp.server --model /models/Meta-Llama-3-8B-Instruct-Q8_0.gguf --n_ctx 8182 --cache true --chat_format llama-3 --n_gpu_layers -1"
-    environment:
-      - HOST=0.0.0.0
-    deploy:
-      resources:
-        limits:
-          memory: 32GB
-        reservations:
-          devices:
-            - driver: nvidia
-              device_ids: ["0"]
-              capabilities: [ gpu ]
-    restart: "always"
-    networks:
-      - hbd-demo-network
+#  hbd_llamacpp:
+#    container_name: hbd_llamacpp
+#    image: llama-cpp-python:latest
+#    build:
+#      context: ./llama-server/
+#      dockerfile: Dockerfile
+#    volumes:
+#      - ~/models/:/models/
+#    command: sh -c "python3 -m llama_cpp.server --model /models/Meta-Llama-3-8B-Instruct-Q8_0.gguf --n_ctx 8182 --cache true --n_gpu_layers -1"
+#    environment:
+#      - HOST=0.0.0.0
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 32GB
+#        reservations:
+#          devices:
+#            - driver: nvidia
+#              device_ids: ["0"]
+#              capabilities: [ gpu ]
+#    restart: "always"
+#    networks:
+#      - hbd-demo-network
 
   hbd_frontend:
     image: hbd-demo-frontend:latest

@@ -13,7 +13,6 @@ RUN python3 -m pip install --upgrade pip pytest cmake scikit-build setuptools fa
 # RUN CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install ./
 RUN CMAKE_ARGS="-DGGML_CUDA=on" FORCE_CMAKE=1 pip install 'llama-cpp-python[server]'
 
-
 # FROM python:3.10
 
 # RUN mkdir -p /workspace/

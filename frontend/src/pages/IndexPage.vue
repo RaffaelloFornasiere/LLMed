@@ -3,7 +3,7 @@
 <div v-if="useLargerScreen"
   class="q-pa-md text-h4 text-center text-weight-bold" style="height: 100%"
 >
-  Application is not supported on smaller screens.
+  Application is not supported on small screens.
   <br>
   <span
   class="text-h6"
