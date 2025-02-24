@@ -1,6 +1,6 @@
 <script>
-import { ref } from "vue";
-import { api } from "boot/axios";
+import {ref} from "vue";
+import {api} from "boot/axios";
 
 export default {
   name: "InputDocument",
@@ -27,6 +27,31 @@ export default {
     };
   },
   methods: {
+    // Emulate file drop from /src/assets/discharge_letter.pdf
+    async emulatePdfDrop() {
+      try {
+        const response = await fetch('/discharge_letter.pdf');
+        const blob = await response.blob();
+
+        const file = new File([blob], 'discharge_letter.pdf', {
+          type: 'application/pdf',
+        });
+
+        const mockEvent = {
+          dataTransfer: {
+            files: [file],
+          },
+        };
+
+        // Directly call the drop function (assuming it's in your component)
+        this.dropFunction(mockEvent);
+        console.log('PDF file injected into dropFunction!');
+      } catch (error) {
+        console.error('Error loading PDF:', error);
+      }
+    },
+
+
     dropFunction(dragEvent) {
       // TODO add revokeObjectURL
       const dropzoneFile = dragEvent.dataTransfer.files[0];
@@ -88,11 +113,16 @@ export default {
 
 <template>
   <div class="column no-wrap full-width">
+
     <q-card class="items-strech" style="height: 100%">
       <div class="col-12 column no-wrap" style="height: 100%">
         <q-card-section class="row justify-between">
-          <div class="col-3"></div>
-          <div class="text-h6 text-primary">Input</div>
+          <div class="col-12 " style="display: flex; justify-content: space-around; align-items: center ">
+
+          <div class="text-h6 text-primary">Input          </div>
+          <q-btn @click="emulatePdfDrop()" color="primary" class="q-pa-md">Use sample document</q-btn>
+          </div>
+
           <div class="col-4">
             <div class="col-6 justify-end row">
               <q-btn

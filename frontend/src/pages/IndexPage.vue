@@ -1,24 +1,23 @@
 <template>
 
-<div v-if="useLargerScreen"
-  class="q-pa-md text-h4 text-center text-weight-bold" style="height: 100%"
->
-  Application is not supported on small screens.
-  <br>
-  <span
-  class="text-h6"
-  >(Minimum screen size: 1024x768)
+  <div v-if="useLargerScreen"
+       class="q-pa-md text-h4 text-center text-weight-bold" style="height: 100%"
+  >
+    Application is not supported on small screens
+    <br>
+    <span
+      class="text-h6"
+    >(Minimum screen size: 1024x768)
   </span>
-</div>
+  </div>
   <q-page
     v-if="!useLargerScreen"
     padding class="row items-stretch" style="height: 100%; min-width: 1024px">
     <div class="col-12 column no-wrap">
       <div class="row no-wrap justify-between" style="height: 100%">
         <div class="column no-wrap full-height full-width">
-          <resizable-drawer
-direction="row"
-          >
+          <resizable-drawer direction="row">
+
             <template v-slot:block1>
               <input-document
                 v-model:input-letter="inputLetter"
@@ -40,7 +39,7 @@ direction="row"
 </template>
 
 <script>
-import { defineComponent, ref } from "vue";
+import {defineComponent, ref} from "vue";
 import MedicalInformationExtraction from "components/MedicalInformationExtraction/MedicalInformationExtraction.vue";
 import DeidentificationClassic from "components/DeidentificationClassic.vue";
 import PharmacologicalEventExtraction from "components/PharmacologicalEventExtraction.vue";
