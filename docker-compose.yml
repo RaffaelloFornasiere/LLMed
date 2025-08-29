@@ -62,7 +62,7 @@ services:
       - CHOKIDAR_USEPOLLING=true
       - NODE_ENV=development
     restart: "always"
-    command: sh -c "npm install && npm audit fix --force && quasar dev --watch"
+    command: sh -c "npm install && quasar dev"
     networks:
       - hbd-demo-network
 
