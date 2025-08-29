@@ -5,7 +5,7 @@ const patientSearch = './patient-search-api'
 const patientSearchApi = axios.create({
   baseURL: patientSearch
 })
-const llamaServer = "./llama-server";
+// Removed llamaServer - now using backend proxy for Groq API
 const baseApi = axios.create()
 const api = axios.create({
   baseURL: "./api/",
@@ -19,4 +19,4 @@ export default boot(({ app }) => {
   app.config.globalProperties.$api = api;
 });
 
-export { axios, api, llamaServer, baseApi,patientSearchApi };
+export { axios, api, baseApi, patientSearchApi };

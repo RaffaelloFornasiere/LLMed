@@ -10,7 +10,7 @@ import json
 from MedInfoExt.medInfoExt import app  as medInfoExt_app
 app = FastAPI()
 
-app.include_router(medInfoExt_app)
+app.include_router(medInfoExt_app, prefix="/api")
 
 app.add_middleware(
     CORSMiddleware,
@@ -37,7 +37,7 @@ def intersect_sets(array):
     final_list = list(result)
     return final_list
 
-@app.post('/convert_pdf')
+@app.post('/api/convert_pdf')
 async def convert_pdf(uploaded_pdf: UploadFile):
     print("FILE: ", uploaded_pdf.filename)
     with fitz.open(stream=BytesIO(uploaded_pdf.file.read())) as document:
@@ -122,4 +122,23 @@ async def convert_pdf(uploaded_pdf: UploadFile):
         # clean_text += header_text
 
         return {'pdf_text': clean_text}
+
+
+@app.post('/api/return_pdf')
+async def return_pdf(uploaded_pdf: UploadFile):
+    """
+    Returns the uploaded PDF file back to the client
+    TODO: Implement any PDF processing if needed
+    """
+    from fastapi.responses import Response
+    
+    # For now, just return the PDF as-is
+    content = await uploaded_pdf.read()
+    return Response(
+        content=content,
+        media_type='application/pdf',
+        headers={
+            "Content-Disposition": f"attachment; filename={uploaded_pdf.filename}"
+        }
+    )
 

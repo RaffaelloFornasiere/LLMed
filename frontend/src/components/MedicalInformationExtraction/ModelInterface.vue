@@ -211,35 +211,31 @@ export default {
       template: ref(""),
       settingsLocal: ref(this.settings),
       modelParameters: {
-        max_tokens: {
-          placeholder: "Max tokens",
+        model: {
+          placeholder: "Model",
+          type: "select",
+          model: ref("llama3-70b-8192"),
+          options: [
+            "llama3-70b-8192",
+            "llama3-8b-8192",
+            "llama-3.1-8b-instant",
+            "gemma2-9b-it"
+          ],
+        },
+        max_completion_tokens: {
+          placeholder: "Max Completion Tokens",
           type: "number",
           model: ref(2048),
         },
         temperature: {
           placeholder: "Temperature",
           type: "float",
-          model: ref(0),
+          model: ref(0.7),
         },
         top_p: {
-          placeholder: "Top_p",
+          placeholder: "Top P",
           type: "float",
-          model: ref(null),
-        },
-        top_k: {
-          placeholder: "Top_k",
-          type: "number",
-          model: ref(null),
-        },
-        mirostat_tau: {
-          placeholder: "Mirostat_tau",
-          type: "float",
-          model: ref(3.0),
-        },
-        repetition_penalty: {
-          placeholder: "Repetition penalty",
-          type: "float",
-          model: ref(1.1),
+          model: ref(0.95),
         },
       },
     };
@@ -291,7 +287,18 @@ export default {
               v-for="[key, param] in Object.entries(modelParameters)"
               :key="param"
             >
+              <q-select
+                v-if="param.type === 'select'"
+                :model-value="param.model"
+                @update:model-value="updateSetting(key, $event)"
+                :options="param.options"
+                :label="param.placeholder"
+                style="width: 48%; flex-grow: 1"
+                class="q-pa-none"
+                dense
+              />
               <q-input
+                v-else
                 :model-value="param.model"
                 @update:model-value="updateSetting(key, $event)"
                 :type="param.type === 'float' ? 'number' : param.type"

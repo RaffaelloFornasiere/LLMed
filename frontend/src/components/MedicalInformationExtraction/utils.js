@@ -1,41 +1,13 @@
 import * as axios from "boot/axios";
-import { api, llamaServer, baseApi } from "boot/axios";
+import { api, baseApi } from "boot/axios";
 
 export let config = {
   advanced: true,
-  servers: [
-    {
-      name: "polimi-llama-server",
-      url: llamaServer,
-      OpenAI_API: true,
-    },
-    // {
-    //   name: "fornasiere-llama-server",
-    //   url: axios.llamaHostAlt,
-    //   OpenAI_API: true,
-    // },
-    // {
-    //   name: "Mixtral",
-    //   url: "http://147.189.192.41:8080",
-    //   OpenAI_API: false,
-    // },
-    {
-      name: "Llama3",
-      url: "http://147.189.192.78:8080",
-      OpenAI_API: false,
-    },
-  ],
-
-  selectedServer: {
-    name: "polimi-llama-server",
-    url: llamaServer,
-    OpenAI_API: true,
-  },
-  customServer: {
-    name: "",
-    url: "",
-    OpenAI_API: false,
-  },
+  // Using backend proxy for Groq API
+  apiEndpoint: "chat/completions",
+  modelsEndpoint: "models",
+  selectedModel: "llama3-70b-8192", // Default Groq model
+  availableModels: [], // Will be populated from API
 };
 
 export function sanitizeTemplate(template) {
@@ -90,36 +62,82 @@ export async function getTasks() {
   return axios.api.get("/get_tasks");
 }
 
-export function askLLM(body) {
-  return axios.baseApi
+export function askLLM(body, params = {}) {
+  // Handle both old format (with prompt) and new format (with messages)
+  let messages;
+  
+  if (body.prompt) {
+    // Old format - convert prompt to messages
+    // Parse the prompt to extract system and user messages
+    const promptParts = body.prompt.split('<|start_header_id|>');
+    messages = [];
+    
+    for (const part of promptParts) {
+      if (part.includes('system<|end_header_id|>')) {
+        const content = part.split('<|end_header_id|>')[1].split('<|eot_id|>')[0].trim();
+        if (content) messages.push({ role: 'system', content });
+      } else if (part.includes('user<|end_header_id|>')) {
+        const content = part.split('<|end_header_id|>')[1].split('<|eot_id|>')[0].trim();
+        if (content) messages.push({ role: 'user', content });
+      } else if (part.includes('assistant<|end_header_id|>')) {
+        const content = part.split('<|end_header_id|>')[1].split('<|eot_id|>')[0].trim();
+        if (content) messages.push({ role: 'assistant', content });
+      }
+    }
+    
+    // Remove old LLaMA-specific parameters
+    delete body.prompt;
+    delete body.top_k;
+    delete body.repetition_penalty;
+    delete body.mirostat_tau;
+    
+    // Map max_tokens to max_completion_tokens
+    if (body.max_tokens) {
+      body.max_completion_tokens = body.max_tokens;
+      delete body.max_tokens;
+    }
+  } else if (Array.isArray(body)) {
+    // New format - already messages array
+    messages = body;
+    body = params;
+  } else if (body.messages) {
+    // Already has messages
+    messages = body.messages;
+  }
+  
+  // Convert to OpenAI/Groq format
+  return axios.api
     .post(
-      buildLLMUrl(),
+      config.apiEndpoint,
       {
-        ...body,
+        model: body.model || config.selectedModel || "llama3-70b-8192",
+        messages: messages,
         stream: false,
-        cache_prompt: true,
-        stop: ["<|im_end|>", "###", '<|eot_id|>'],
+        temperature: body.temperature,
+        max_completion_tokens: body.max_completion_tokens,
+        top_p: body.top_p,
       },
       {
         "Content-Type": "application/json",
         timeout: 600000,
       }
     )
-    .then(mapLLMAnswer);
+    .then(response => response.data.choices[0].message.content);
 }
 
-export function sendMessageToLLM(chat, params) {
-  return fetch(llamaServer + "/v1/chat/completions", {
+export function sendMessageToLLM(messages, params = {}) {
+  // Use backend proxy for Groq API
+  const url = window.location.origin + "/api/" + config.apiEndpoint;
+  return fetch(url, {
     method: "POST",
     body: JSON.stringify({
-      messages: chat,
+      model: config.selectedModel || "llama3-70b-8192",
+      messages: messages,
       stream: true,
-      cache_prompt: true,
       ...params,
     }),
     headers: {
       "Content-Type": "application/json",
-      timeout: 36000,
     },
   }).then((response) => {
     if (!response.ok) {
@@ -129,30 +147,34 @@ export function sendMessageToLLM(chat, params) {
   });
 }
 
-export function buildLLMUrl() {
-  return (
-    config.selectedServer.url +
-    (config.selectedServer.OpenAI_API ? "/v1/completions" : "/completion")
-  );
-}
-
-function mapLLMAnswer(response) {
-  let res = "";
-  if (config.selectedServer.OpenAI_API) {
-    res = response.data.choices[0].text;
-  } else {
-    res = response.data.content;
+export async function getAvailableModels() {
+  try {
+    const response = await axios.api.get(config.modelsEndpoint);
+    config.availableModels = response.data;
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch models:", error);
+    return [];
   }
-  res.replace("<dummy32000>", "");
-  return res;
 }
 
-export function saveServer() {
-  config.servers.push(config.customServer);
-  config.customServer = {
-    name: "",
-    url: "",
-    OpenAI_API: false,
-    reachable: false,
-  };
+export function convertPromptToMessages(prompt, systemMessage = "", completionInit = "") {
+  // Convert old prompt format to messages array
+  const messages = [];
+  
+  if (systemMessage) {
+    messages.push({ role: "system", content: systemMessage });
+  }
+  
+  messages.push({ role: "user", content: prompt });
+  
+  if (completionInit) {
+    messages.push({ role: "assistant", content: completionInit });
+  }
+  
+  return messages;
+}
+
+export function setSelectedModel(modelId) {
+  config.selectedModel = modelId;
 }
