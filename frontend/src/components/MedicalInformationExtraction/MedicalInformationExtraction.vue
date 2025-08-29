@@ -7,8 +7,6 @@ import {
   saveServer,
 } from "components/MedicalInformationExtraction/utils";
 import * as docs from "./documents.json";
-import Chat from "components/MedicalInformationExtraction/MIEChat.vue";
-import ChatBot from "components/ChatBot.vue";
 import MIEChat from "components/MedicalInformationExtraction/MIEChat.vue";
 
 let documents = Object.fromEntries(

@@ -41,11 +41,6 @@
 <script>
 import {defineComponent, ref} from "vue";
 import MedicalInformationExtraction from "components/MedicalInformationExtraction/MedicalInformationExtraction.vue";
-import DeidentificationClassic from "components/DeidentificationClassic.vue";
-import PharmacologicalEventExtraction from "components/PharmacologicalEventExtraction.vue";
-import ChatBot from "components/ChatBot.vue";
-import QuestionAnswering from "components/QuestionAnswering.vue";
-import PatientSearch from "components/PatientSearch.vue";
 import MIEChat from "components/MedicalInformationExtraction/MIEChat.vue";
 import ResizableDrawer from "src/utils/ResizableDrawer.vue";
 import InputDocument from "components/InputDocument.vue";
